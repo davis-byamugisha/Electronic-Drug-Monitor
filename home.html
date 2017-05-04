@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="*"> <!-- Do not remove. -->
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+                var storedUsername = $.session.get("storedUsername");
+                if (storedUsername == undefined) {
+                    window.location = 'index.html';
+                    return false;
+                } else {
+                    if (window.location.href.indexOf('loaded') == -1) {
+                        window.location.replace(window.location.href + '?loaded');
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+
+        <div data-role="page">
+            <div data-role="header">
+                <a href="#" onclick="window.location = 'home.html';" class="ui-btn ui-corner-all ui-shadow ui-icon-home ui-btn-icon-left" id="home_link">Home</a>
+                <h1>eDrug Monitor</h1>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-power ui-btn-icon-right" style="color: orangered;" id="logout">Logout</a>
+            </div>
+
+            <div data-role="main" class="ui-content">
+
+                <h1 id="head_h1" style="font-family: monospace; text-align: center"></h1>
+                <div class="ui-grid-a">
+                    <div class="ui-block-d">
+                        <a href="#" class="ui-corner-all ui-shadow">Username : </a>&nbsp;&nbsp;&nbsp;<span id="username"></span>
+                    </div><br>
+                    <div class="ui-block-d">
+                        <a href="#" class="ui-corner-all ui-shadow">Full Name : </a>&nbsp;&nbsp;&nbsp;<span id="fullname"></span>
+                    </div>
+
+                </div>
+                <br>
+                <br>
+
+                <ul data-role='listview' data-inset='true' id='hospital_menu' style="display: none;">
+                    <li data-role="list-divider">Hospital users</li>
+                    <li><a href="#" id="add_user_link">Add user</a></li>
+                    <li><a href='#' id='view_user_link'>View users</a></li>
+
+                    <li data-role="list-divider">Drugs</li>
+                    <li><a href='#' id="in_store_link">In store</a></li>
+                    <li><a href='#' id='order_drugs_link'>Order</a></li>
+                    <!--<li><a href='#'>Receive</a></li>-->
+                    <li><a href='#' id="dispense_link">Dispense</a></li>
+                    <li data-role="list-divider">Report</li>
+                    <li><a href='#' id="drug_usage">View report</a></li>
+                </ul>
+
+                <ul data-role='listview' data-inset='true' id='hc_menu' style="display: none;">
+                    <li data-role="list-divider">Health Center Users</li>
+                    <li><a href='#' id="add_user_link">Add user</a></li>
+                    <li><a href='#' id='view_user_link'>View users</a></li>
+                    <li data-role="list-divider">Drugs</li>
+                    <li><a href='#' id="in_store_link">In store</a></li>
+                    <li><a href='#' id='order_drugs_link'>Order</a></li>
+                    <!--<li><a href='#'>Receive</a></li>-->
+                    <li><a href='#' id="dispense_link">Dispense</a></li>                    
+                    <li data-role="list-divider">Report</li>
+                    <li><a href='#' id="drug_usage">View report</a></li> 
+                </ul>
+
+                <ul data-role='listview' data-inset='true' id='dda_menu' style="display: none;">
+                    <li data-role="list-divider">District Drug Authority users</li>
+                    <li><a href='#' id="add_user_link">Add user</a></li>
+                    <li><a href='#' id='view_user_link'>View users</a></li>
+                    <li data-role="list-divider">Drugs</li>
+                    <li><a href='#' id="in_store_link">In store</a></li>
+                    <li><a href='#' id='order_drugs_link'>Order</a></li>
+                    <!--<li><a href='#'>Receive</a></li>-->
+                    <li data-role="list-divider">Report</li>
+                    <!--<li><a href='#'>District report</a></li>-->
+                    <!--<li><a href='#'>Health center</a></li>-->
+                    <li data-role="list-divider">Quick links</li>
+                    <li><a href='#' id='add_health_facility_link'>Add health facility</a></li>
+                </ul>
+
+                <ul data-role='listview' data-inset='true' id='nda_menu' style="display: none;">
+                    <li data-role="list-divider">National Drug Authority users</li>
+                    <li><a href='#' id="add_user_link">Add user</a></li>
+                    <li><a href='#' id='view_user_link'>View users</a></li>
+                    <li data-role="list-divider">Drugs</li>
+                    <li><a href='#' id="drug_usage">View drug usage(district & hospital)</a></li>
+                    <li><a href='#' id='receive_orders_link'>Receive orders</a></li>
+                    <li><a href='#' id='add_drugs_link'>Add drugs</a></li>
+                    <!--                    <li data-role="list-divider">Reports</li>
+                                        <li><a href='#'>From the district</a></li>
+                                        <li><a href='#'>Hospital</a></li>-->
+                    <!--<li><a href='#'>nda report</a></li>-->
+
+                    <li data-role="list-divider">Quick links</li>
+                    <li><a href='#' id='add_hospital_link'>Add hospital</a></li>
+                    <li><a href='#' id='add_district_link'>Add district</a></li>
+                </ul>
+
+                <ul data-role='listview' data-inset='true' id='admin_menu' style="display: none;">
+                    <li data-role="list-divider">Administrator</li>
+                    <li><a href='#' id="add_user_link_admin">Add user</a></li>
+                    <li><a href='#' id='view_user_link'>View users</a></li>
+                </ul>
+
+            </div>
+
+            <div data-role="footer" data-position="fixed">
+                <h6 style="font-style: italic;">&COPY; Final year project 2017</h6>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                // Getting the variables
+                var storedCenterId = $.session.get("storedCenterId");
+                var storedCenterName = $.session.get("storedCenterName");
+                var storedUsername = $.session.get("storedUsername");
+                var storedFullName = $.session.get("storedFullName");
+                var storedCenterTypeId = $.session.get("storedCenterTypeId");
+                var storedCenterTypeName = $.session.get("storedCenterTypeName");
+                var storedNoOrders = $.session.get("storedNoOrders");
+
+                $("#head_h1").text(storedCenterName);
+                $("#username").text(storedUsername);
+                $("#fullname").text(storedFullName);
+
+                if (storedCenterTypeId == 1) {
+                    $("#hospital_menu").show();
+                    $("#nda_menu").remove();
+                    $("#dda_menu").remove();
+                    $("#hc_menu").remove();
+                }
+
+                if (storedCenterTypeId == 2) {
+                    $("#hc_menu").show();
+                    $("#dda_menu").remove();
+                    $("#nda_menu").remove();
+                    $("#hospital_menu").remove();
+                }
+
+                if (storedCenterTypeId == 3) {
+                    $("#dda_menu").show();
+                    $("#nda_menu").remove();
+                    $("#hospital_menu").remove();
+                    $("#hc_menu").remove();
+                }
+
+                if (storedCenterTypeId == 4) {
+                    $("#nda_menu").show();
+                    $("#hospital_menu").remove();
+                    $("#dda_menu").remove();
+                    $("#hc_menu").remove();
+                }
+
+                if (storedCenterTypeId == 0) {
+                    $("#nda_menu").remove();
+                    $("#hospital_menu").remove();
+                    $("#dda_menu").remove();
+                    $("#hc_menu").remove();
+                    $("#admin_menu").show();
+                }
+
+                $("#logout").click(function (e) {
+                    if (confirm("Are you sure?")) {
+                        $.session.clear();
+                        window.location = "index.html";
+                    }
+                });
+
+// Responding to HOME PAGE links
+                $("#in_store_link").click(function () {
+                    window.location = "in_store.html";
+                });
+
+                $("#add_user_link").click(function () {
+                    window.location = "add_user.html";
+                });
+
+                $("#add_user_link_admin").click(function () {
+                    window.location = "add_user_admin.html";
+                });
+
+                $("#view_user_link").click(function () {
+                    window.location = "view_users.html";
+                });
+
+                $("#order_drugs_link").click(function () {
+                    window.location = "order_drugs.html";
+                });
+
+                $("#receive_orders_link").click(function () {
+                    window.location = "receive_orders.html";
+                });
+
+                $("#dispense_link").click(function () {
+                    window.location = "dispense_drugs.html";
+                });
+
+                $("#drug_usage").click(function () {
+                    window.location = "drug_usage.html";
+                });
+
+                $("#add_health_faclity_link").click(function () {
+                    window.location = "add_health_facility.html";
+                });
+
+                $("#add_district_link").click(function () {
+                    window.location = "add_district.html";
+                });
+
+                $("#add_hospital_link").click(function () {
+                    window.location = "add_hospital.html";
+                });
+
+                $("#add_drugs_link").click(function () {
+                    window.location = "add_drugs.html";
+                });
+            });
+        </script>
+
+    </body>
+</html>

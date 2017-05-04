@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+
+    </head>
+    <body>
+
+        <div data-role="page">
+            <div data-role="header">
+                <h1>eDrug Monitor</h1>
+            </div>
+
+            <div data-role="main" class="ui-content">
+                <div class="ui-field-contain">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" required id="username">   
+
+                    <label for="password">Password</label>
+                    <input type="password" name="password" required id="password"> 
+                </div>
+                <input type="submit" data-inline="true" id="submit" value="Login">
+                <p><b>Note:</b> Click the login button to sign in.</p>
+            </div>
+        </div>
+
+
+        <script>
+            $(document).ready(function () {
+                // checking to see if the person is already logged in
+                var storedUsername = $.session.get("storedUsername");
+
+                if (storedUsername != undefined) {
+                    window.location = 'home.html';
+                }
+
+                // setting a universal url
+//                $.session.set("ip", "http://www.kenpaper.com");
+                $.session.set("ip", "http://localhost/Phonegap/edrug_monitor");
+
+                $('#submit').click(function (e) {
+                    e.preventDefault();
+
+                    var username = $("#username").val();
+                    var password = $("#password").val();
+
+                    if (username == '' || password == '') {
+                        alert("Fill all fields");
+                        return false;
+                    }
+
+                    var dataString = "username=" + username + "&password=" + password;
+
+                    if ($.trim(username).length > 0 && $.trim(password).length > 0) {
+                        $.ajax({
+                            type: "POST",
+                            url: $.session.get("ip") + "/scripts_edrugmonitor/login.php",
+                            data: dataString,
+                            crossDomain: true,
+                            cache: false,
+                            success: function (result) {
+                                if (result == 'Denied') {
+                                    alert("Invalid login");
+                                    return false;
+                                } else {
+                                    var dataArray = JSON.parse(result);
+
+                                    $.each(dataArray, function (i, elem) {
+                                        $.session.set(i, elem);
+                                    });
+
+//                                $.session.set("fullName", result); // storing the variables in a session
+                                    window.location = 'home.html';
+                                }
+                            }
+                        });
+                    }
+
+                });
+            });
+
+        </script>
+
+    </body>
+</html>

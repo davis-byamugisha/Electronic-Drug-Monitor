@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+
+    </head>
+    <body>
+        <div data-role="page" id="receive_orders">
+            <div data-role="header">
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-home ui-btn-icon-left" id="home_link">Home</a>
+                <h1>eDrug Monitor</h1>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-power ui-btn-icon-right" style="color: orangered;" id="logout">Logout</a>
+            </div>
+
+            <div data-role="main" class="ui-content">
+
+                <h1 id="head_h1" style="font-family: monospace; text-align: center"></h1>
+                <div class="ui-grid-a">
+                    <div class="ui-block-d">
+                        <a href="#" class="ui-corner-all ui-shadow">Username : </a>&nbsp;&nbsp;&nbsp;<span id="username"></span>
+                    </div><br>
+                    <div class="ui-block-d">
+                        <a href="#" class="ui-corner-all ui-shadow">Full Name : </a>&nbsp;&nbsp;&nbsp;<span id="fullname"></span>
+                    </div>
+
+                </div>
+                <br>
+                <br>
+                <h3>District orders</h3>
+                <table data-role="table" data-mode="" class="ui-responsive ui-shadow" id="myTable1">
+                    <thead>
+                        <tr>
+                            <th>Order Date</th>
+                            <th>Ordered By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <br>
+                <br>
+                <h3>Hospital orders</h3>
+                <table data-role="table" data-mode="" class="ui-responsive ui-shadow" id="myTable2">
+                    <thead>
+                        <tr>
+                            <th>Order Date</th>
+                            <th>Ordered By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div data-role="footer" data-position="fixed">
+                <h6 style="font-style: italic;">&COPY; Final year project 2017</h6>
+            </div>
+        </div>
+
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="*"> <!-- Do not remove. -->
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+                var storedUsername = $.session.get("storedUsername");
+                if (storedUsername == undefined) {
+                    window.location = 'index.html';
+                    return false;
+                } else {
+                    if (window.location.href.indexOf('loaded') == -1) {
+                        window.location.replace(window.location.href + '?loaded');
+                    }
+                }
+            });
+        </script>
+
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                // Getting the variables
+                var storedCenterId = $.session.get("storedCenterId");
+                var storedCenterName = $.session.get("storedCenterName");
+                var storedUsername = $.session.get("storedUsername");
+                var storedFullName = $.session.get("storedFullName");
+                var storedCenterTypeId = $.session.get("storedCenterTypeId");
+                var storedCenterTypeName = $.session.get("storedCenterTypeName");
+
+                var storedNoOrders = $.session.get("storedNoOrders");
+                $("#head_h1").text(storedCenterName);
+                $("#username").text(storedUsername);
+                $("#fullname").text(storedFullName);
+
+
+                var dataString = "center_id=" + storedCenterId;
+
+                $.ajax({
+                    type: "POST",
+                    url: $.session.get("ip") + "/scripts_edrugmonitor/receive_district_orders.php",
+                    data: dataString,
+                    crossDomain: true,
+                    cache: false,
+                    success: function (result) {
+                        var tbody = $('#myTable1 > tbody');
+                        $(result).appendTo(tbody);
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: $.session.get("ip") + "/scripts_edrugmonitor/receive_hospital_orders.php",
+                    data: dataString,
+                    crossDomain: true,
+                    cache: false,
+                    success: function (result) {
+                        var tbody2 = $('#myTable2 > tbody');
+                        $(result).appendTo(tbody2);
+                    }
+                });
+
+                $("#myTable1, #myTable2").on("click", "input", function (e) {
+                    e.preventDefault();
+                    var id = /\d+(?=\D*$)/.exec($(this).attr('id'));
+
+                    var sent_by = $("#sent_by" + id).val();
+                    var sent_to = $("#sent_to" + id).val();
+                    var date_ordered = $("#date_ordered" + id).val();
+
+                    $.session.set("storedSentBy", sent_by);
+                    $.session.set("storedSentTo", sent_to);
+                    $.session.set("storedDateOrdered", date_ordered);
+
+                    window.location = 'view_order_details.html';
+
+
+                });
+
+                // Other even listeners 
+                $("#logout").click(function (e) {
+                    if (confirm("Are you sure?")) {
+                        $.session.clear();
+                        window.location = "index.html";
+                    }
+                });
+
+                $("#home_link").click(function (e) {
+                    window.location = "home.html";
+                });
+
+            });
+        </script>
+
+
+
+    </body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+//            function getUsers() {
+//                if (window.XMLHttpRequest) {
+//                    // code for IE7+, Firefox, Chrome, Opera, Safari
+//                    xmlhttp = new XMLHttpRequest();
+//                } else {
+//                    // code for IE6, IE5
+//                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+//                }
+//                xmlhttp.onreadystatechange = function () {
+//                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+//                        document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+//                    }
+//                };
+//                xmlhttp.open("GET", "http://192.168.43.64/Phonegap/scripts_edrugmonitor/view_users.php", true);
+//                xmlhttp.send();
+//
+//            }
+//            getUsers();
+        </script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="*"> <!-- Do not remove. -->
+        <script type="text/javascript">
+
+
+            $(document).ready(function () {
+                var storedUsername = $.session.get("storedUsername");
+                if (storedUsername == undefined) {
+                    window.location = 'index.html';
+                    return false;
+                } else {
+                    if (window.location.href.indexOf('loaded') == -1) {
+                        window.location.replace(window.location.href + '?loaded');
+                    }
+                }
+            });
+
+
+        </script>
+    </head>
+    <body>
+
+        <div data-role="page">
+            <div data-role="header">
+                <a href="#" onclick="window.location = 'home.html';" class="ui-btn ui-corner-all ui-shadow ui-icon-home ui-btn-icon-left">Home</a>
+                <h1>eDrug Monitor</h1>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-power ui-btn-icon-right" style="color: orangered;" id="logout">Logout</a>
+            </div>
+
+            <div data-role="main" class="ui-content">
+
+                <h1 id="head_h1" style="font-family: monospace; text-align: center"></h1>
+                <h3 style="font-family: monospace; text-align: center; text-decoration: underline;">Registered Users</h3>
+
+                <table data-role="table" data-mode="columntoggle" class="ui-responsive ui-shadow" id="myTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Names</th>
+                            <!--<th data-priority="1">Email</th>-->
+                            <th data-priority="1">Phone</th>
+                            <!--<th data-priority="3">Username</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div data-role="footer" data-position="fixed">
+                <h6 style="font-style: italic;">&COPY; Final year project 2017</h6>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            $(document).on("ready", function () {
+
+                // Getting the variables
+                var storedCenterId = $.session.get("storedCenterId");
+                var storedCenterName = $.session.get("storedCenterName");
+                var storedUsername = $.session.get("storedUsername");
+                var storedFullName = $.session.get("storedFullName");
+
+                $("#head_h1").text(storedCenterName);
+                $("#username").text(storedUsername);
+                $("#fullname").text(storedFullName);
+
+
+                var center_id = storedCenterId;
+
+                var dataString = "center_id=" + center_id;
+
+                $.ajax({
+                    type: "POST",
+                    url: $.session.get("ip") + "/scripts_edrugmonitor/view_users.php",
+                    data: dataString,
+                    crossDomain: true,
+                    cache: false,
+                    success: function (result) {
+//                        $(result).appendTo("#myTable").trigger("create");
+                        var tbody = $('#myTable > tbody');
+                        $(result).appendTo(tbody).enhanceWithin();
+//                        $("#myTable").page('refresh', true);
+
+                    }
+                });
+
+
+                $("#logout").click(function (e) {
+                    if (confirm("Are you sure?")) {
+                        $.session.clear();
+                        window.location = "index.html";
+                    }
+                });
+
+
+            });
+
+        </script>
+
+    </body>
+</html>

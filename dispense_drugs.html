@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="*"> <!-- Do not remove. -->
+        <script type="text/javascript">
+
+
+            $(document).ready(function () {
+                var storedUsername = $.session.get("storedUsername");
+                if (storedUsername == undefined) {
+                    window.location = 'index.html';
+                    return false;
+                } else {
+                    if (window.location.href.indexOf('loaded') == -1) {
+                        window.location.replace(window.location.href + '?loaded');
+                    }
+                }
+            });
+
+
+        </script>
+    </head>
+    <body>
+
+        <div data-role="page">
+            <div data-role="header">
+                <a href="#" onclick="window.location = 'home.html';" class="ui-btn ui-corner-all ui-shadow ui-icon-home ui-btn-icon-left">Home</a>
+                <h1>eDrug Monitor</h1>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-power ui-btn-icon-right" style="color: orangered;" id="logout">Logout</a>
+            </div>
+
+            <div data-role="main" class="ui-content">
+
+                <h1 id="head_h1" style="font-family: monospace; text-align: center"></h1>
+                <h3 style="font-family: monospace; text-align: center; text-decoration: underline;">Dispense drugs</h3>
+
+                <table data-role="table" data-mode="columntoggle" class="ui-responsive ui-shadow" id="myTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Drug Name</th>
+                            <th>Stock</th>
+                            <th>Dispense</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <input type="submit" data-inline="false" id="button" name="button" value="Dispense Drugs">
+            </div>
+
+            <div data-role="footer" data-position="fixed">
+                <h6 style="font-style: italic;">&COPY; Final year project 2017</h6>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            $(document).on("ready", function () {
+
+                // Getting the variables
+                var storedCenterId = $.session.get("storedCenterId");
+                var storedCenterName = $.session.get("storedCenterName");
+                var storedUsername = $.session.get("storedUsername");
+                var storedFullName = $.session.get("storedFullName");
+
+                $("#head_h1").text(storedCenterName);
+                $("#username").text(storedUsername);
+                $("#fullname").text(storedFullName);
+
+                var center_id = storedCenterId;
+
+                var dataString = "center_id=" + center_id;
+
+                $.ajax({
+                    type: "POST",
+                    url: $.session.get("ip") + "/scripts_edrugmonitor/view_drugs_to_dispense.php",
+                    data: dataString,
+                    crossDomain: true,
+                    cache: false,
+                    success: function (result) {
+                        var tbody = $('#myTable > tbody');
+                        $(result).appendTo(tbody);
+
+                        $("#myTable").page('refresh', true);
+                    }
+                });
+
+
+                $("#button").click(function (e) {
+                    e.preventDefault();
+
+                    var drugIdArray = [];
+                    var stockArray = [];
+                    var dispenseArray = [];
+
+                    $("input[name^='drug_id']").each(function () {
+                        var value = $(this).val();
+                        drugIdArray.push(value);
+                    });
+
+                    $("input[name^='stock']").each(function () {
+                        var value = $(this).val();
+                        stockArray.push(value);
+                    });
+
+                    $("input[name^='dispense']").each(function () {
+                        var value = $(this).val();
+                        dispenseArray.push(value);
+                    });
+
+                    var drugIdArrayS = JSON.stringify(drugIdArray);
+                    var stockArrayS = JSON.stringify(stockArray);
+                    var dispenseArrayS = JSON.stringify(dispenseArray);
+
+//                    alert(dispenseArray);
+//                    return false;
+                    $.ajax({
+                        type: "POST",
+                        url: $.session.get("ip") + "/scripts_edrugmonitor/dispense_drugs.php",
+                        data: {
+                            drugIdArray: drugIdArrayS,
+                            stockArray: stockArrayS,
+                            dispenseArray: dispenseArrayS,
+                            center_id: center_id
+                        },
+                        crossDomain: true,
+                        cache: false,
+                        success: function (result) {
+                            alert(result);
+                            window.location = "in_store.html";
+                        }
+                    });
+
+
+                });
+
+
+                $("#logout").click(function (e) {
+                    if (confirm("Are you sure?")) {
+                        $.session.clear();
+                        window.location = "index.html";
+                    }
+                });
+            });
+
+        </script>
+
+    </body>
+</html>

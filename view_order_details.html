@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="*"> <!-- Do not remove. -->
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var storedUsername = $.session.get("storedUsername");
+                if (storedUsername == undefined) {
+                    window.location = 'index.html';
+                    return false;
+                } else {
+                    if (window.location.href.indexOf('loaded') == -1) {
+                        window.location.replace(window.location.href + '?loaded');
+                    }
+                }
+
+//                $('#receive_orders').live('pagebeforeshow', function (e, data) {
+//                    alert(data.prevPage.find('div[data-role="content"]').attr('id'));
+//                    alert();
+//                });
+
+            });
+        </script>
+    </head>
+    <body>
+
+        <div data-role="page" id="view_order_details">
+            <div data-role="header">
+                <a href="#" onclick="window.location = 'home.html';" class="ui-btn ui-corner-all ui-shadow ui-icon-home ui-btn-icon-left">Home</a>
+                <h1>eDrug Monitor</h1>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-power ui-btn-icon-right" style="color: orangered;" id="logout">Logout</a>
+            </div>
+
+            <div data-role="main" class="ui-content">
+
+                <h1 id="head_h1" style="font-family: monospace; text-align: center"></h1>
+                <h3 style="font-family: monospace; text-align: center; text-decoration: underline;">View Order</h3>
+                <!--<h4>Ordered by: <input id="ordered_by" type="text" readonly value=""></h4>-->
+                <form method="post" action="../../scripts_edrugmonitor/receive_order.php" id="form">
+                    <table data-role="table" data-mode="columntoggle" class="ui-responsive ui-shadow" id="myTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Drug</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                    <input type="submit" data-inline="false" id="receive_order" name="receive_order" value="Receive order">
+                </form>
+            </div>
+
+            <div data-role="footer" data-position="fixed">
+                <h6 style="font-style: italic;">&COPY; Final year project 2017</h6>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            $(document).on("pagecreate", function () {
+
+                // Getting the variables
+                var storedCenterId = $.session.get("storedCenterId");
+                var storedCenterName = $.session.get("storedCenterName");
+                var storedUsername = $.session.get("storedUsername");
+                var storedFullName = $.session.get("storedFullName");
+
+                var sent_by = $.session.get("storedSentBy");
+                var sent_to = $.session.get("storedSentTo");
+                var date_ordered = $.session.get("storedDateOrdered");
+
+
+                $("#head_h1").text(storedCenterName);
+                $("#username").text(storedUsername);
+                $("#fullname").text(storedFullName);
+
+
+                $.ajax({
+                    type: "POST",
+                    url: $.session.get("ip") + "/scripts_edrugmonitor/view_order_details.php",
+                    data: {
+                        center_id: sent_to, //storedCenterId,
+                        date_ordered: date_ordered,
+                        sent_by: sent_by,
+                    },
+                    crossDomain: true,
+                    cache: false,
+                    success: function (result) {
+                        var tbody = $('#myTable > tbody');
+                        $(result).appendTo(tbody);
+                    }
+                });
+
+
+                // Submitting these fields
+                $('#receive_order').click(function (event) {
+                    event.preventDefault();
+                    var orderIdArray = [];
+                    var drugIdArray = [];
+                    var quantityArray = [];
+
+                    $("input[name^='order_id']").each(function () {
+//                        var key = this.id;
+                        var value = $(this).val();
+                        orderIdArray.push(value);
+                    });
+
+                    $("input[name^='drug_id']").each(function () {
+//                        var key = this.id;
+                        var value = $(this).val();
+                        drugIdArray.push(value);
+                    });
+
+                    $("input[name^='quantity']").each(function () {
+//                        var key = this.id;
+                        var value = $(this).val();
+                        quantityArray.push(value);
+                    });
+
+                    var orderIdArrayString = JSON.stringify(orderIdArray);
+                    var drugIdArrayString = JSON.stringify(drugIdArray);
+                    var quantityArrayString = JSON.stringify(quantityArray);
+
+                    $.ajax({
+                        type: "POST",
+                        url: $.session.get("ip") + "/scripts_edrugmonitor/receive_order.php",
+                        data: {
+                            orderIdArrayString: orderIdArrayString,
+                            drugIdArrayString: drugIdArrayString,
+                            quantityArrayString: quantityArrayString,
+                            sent_by: sent_by
+                        },
+                        crossDomain: true,
+                        cache: false,
+                        success: function (result) {
+                            alert(result);
+                            window.location = "receive_orders.html";
+                        }
+                    });
+                });
+
+                // Other even listeners 
+                $("#logout").click(function (e) {
+                    if (confirm("Are you sure?")) {
+                        $.session.clear();
+                        window.location = "index.html";
+                    }
+                });
+            });
+
+        </script>
+
+    </body>
+</html>

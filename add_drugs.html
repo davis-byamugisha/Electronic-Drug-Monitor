@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="*"> <!-- Do not remove. -->
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+                var storedUsername = $.session.get("storedUsername");
+                if (storedUsername == undefined) {
+                    window.location = 'index.html';
+                    return false;
+                } else {
+                    if (window.location.href.indexOf('loaded') == -1) {
+                        window.location.replace(window.location.href + '?loaded');
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+
+        <div data-role="page">
+            <div data-role="header">
+                <a href="#" onclick="window.location = 'home.html';" class="ui-btn ui-corner-all ui-shadow ui-icon-home ui-btn-icon-left">Home</a>
+                <h1>eDrug Monitor</h1>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-power ui-btn-icon-right" style="color: orangered;" id="logout">Logout</a>
+            </div>
+
+            <div data-role="main" class="ui-content">
+
+                <h1 id="head_h1" style="font-family: monospace; text-align: center"></h1>
+                <h3 style="font-family: monospace; text-align: center; text-decoration: underline;">Add drugs</h3>
+
+                <form method="post" action="demoform.asp">
+                    <div class="ui-field-contain">
+                        <label for="center_name">Drug Name</label>
+                        <input type="text" required name="drug_name" id="drug_name">  
+
+                        <label for="code">Code</label>
+                        <input type="text" required name="code" id="code">
+
+                        <label for="reorder">Reorder Level</label>
+                        <input type="number" required name="reorder" id="reorder">
+                    </div>
+                    <input type="submit" class="btn" data-inline="true" id="btn" value="Submit">
+                    <input type="reset" data-inline="true" id="btn" value="Reset">
+                </form>
+
+            </div>
+
+            <div data-role="footer" data-position="fixed">
+                <h6 style="font-style: italic;">&COPY; Final year project 2017</h6>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                // Getting the variables
+                var storedCenterId = $.session.get("storedCenterId");
+                var storedCenterName = $.session.get("storedCenterName");
+                var storedUsername = $.session.get("storedUsername");
+                var storedFullName = $.session.get("storedFullName");
+
+                $("#head_h1").text(storedCenterName);
+                $("#username").text(storedUsername);
+                $("#fullname").text(storedFullName);
+
+                $("#btn").click(function () {
+                    var drug_name = $("#drug_name").val();
+                    var code = $("#code").val();
+                    var reorder = $("#reorder").val();
+
+
+                    if (drug_name == "" || code == "" || reorder == "") {
+                        alert("Fill out all fields");
+                        return false;
+                    }
+
+
+                    var center_type = 1; // 1 is hospital in the centers table
+                    var dataString = "drug_name=" + drug_name + "&code=" + code + "&reorder=" + reorder;
+
+                    $.ajax({
+                        type: "POST",
+                        url: $.session.get("ip") + "/scripts_edrugmonitor/add_drug.php",
+                        data: dataString,
+                        crossDomain: true,
+                        cache: false,
+                        success: function (result) {
+                            if (result == 'Success') {
+                                alert("Drug added");
+                                window.location = "home.html";
+                            } else {
+                                alert("Server error");
+                            }
+                        }
+                    });
+                });
+
+
+
+                $("#logout").click(function (e) {
+                    if (confirm("Are you sure?")) {
+                        $.session.clear();
+                        window.location = "index.html";
+                    }
+                });
+
+
+
+
+            });
+
+        </script>
+
+    </body>
+</html>
